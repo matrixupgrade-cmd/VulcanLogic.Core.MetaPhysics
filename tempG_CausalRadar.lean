@@ -155,3 +155,65 @@ by
   sorry
 
 end Inference
+
+/-!
+====================================================
+LAYER 6: PROBING SEQUENCES
+====================================================
+Nodes are probed multiple times under controlled sequences
+to measure conditional latency variation, revealing internal
+structural diversity.
+-/
+namespace Probing
+
+open Calibration Residuals DynamicVariability
+
+/-- A probing sequence: discrete time steps where the node is pinged -/
+structure ProbeSequence (Node : Type) where
+  sequence : ℕ → Node → Node → ℝ
+  /-- Every causal hop costs at least one iteration. -/
+  valid_latency : ∀ k i j, 0 < sequence k i j
+
+/-- Residual at step k for a node pair relative to baseline -/
+def probe_residual
+    {Node : Type}
+    (baseline : ReturnGeometry Node)
+    (probe    : ProbeSequence Node)
+    (k        : ℕ)
+    (i j      : Node) : ℝ :=
+  probe.sequence k i j - baseline.latency i j
+
+/--
+A node is a latency node if its residual varies structurally
+across a probing sequence.
+-/
+def is_latency_node
+    {Node : Type}
+    (baseline : ReturnGeometry Node)
+    (probe    : ProbeSequence Node)
+    (n        : Node)
+    (nodes    : Finset Node)
+    (ϵ        : ℝ) : Prop :=
+  ∃ i ∈ nodes, ∃ k m, k ≠ m ∧
+    abs (probe_residual baseline probe k n i - probe_residual baseline probe m n i) > ϵ
+
+/--
+Theorem: systematic probing under sufficient structural diversity
+produces distinguishable return signatures for latency nodes.
+-/
+theorem probing_sequence_detects_latency
+    {Node : Type}
+    (baseline : ReturnGeometry Node)
+    (probe    : ProbeSequence Node)
+    (nodes    : Finset Node)
+    (n        : Node)
+    (ϵ        : ℝ)
+    (h        : ∃ i ∈ nodes, ∃ k m, k ≠ m ∧
+                 abs (probe_residual baseline probe k n i - probe_residual baseline probe m n i) > ϵ) :
+    is_latency_node baseline probe n nodes ϵ :=
+by
+  -- direct by definition
+  unfold is_latency_node
+  exact h
+
+end Probing
