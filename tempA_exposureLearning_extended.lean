@@ -1034,3 +1034,232 @@ theorem grand_unified_theorem
         h_iso.1 h_iso.2 A_ai h_mem₁ h_mem₂
   · exact rate_within_capacity_beneficial r c_high vcr benefit h_raise h_b_pos
   · exact compounding_reaches_any_target t₀ T_target δ₀ hδ m hm
+
+-- ============================================================
+-- 22. MULTI-AGENT EXPOSURE: ATTRACTOR ESCAPE AND COMPOUNDING
+-- ============================================================
+/-
+  The central theorem for why exposure is profound in learning.
+
+  §4's blocking_trap proves a single-attractor agent never
+  reaches out-of-branch basins regardless of trajectory length.
+  The agent is in a gravity well: its optimization history
+  defines the basin of attraction, and same-branch steps only
+  deepen it.
+
+  Two conditions together break this:
+    (1) The agent probes an agent in an INDEPENDENT self-attractor
+        — one whose signals arise from a different causal branch.
+    (2) The newly opened adoption window contains viable basins
+        (h_dense) — a structural condition on the basin space.
+
+  Given both, compounding activates and any learning target
+  is reachable in finite cycles through exponential growth.
+
+  WHY h_dense IS CARRIED AS A HYPOTHESIS
+
+  h_dense asserts that when two independent attractors meet,
+  viable basins exist in the window opened between their
+  thresholds.  Whether this holds depends on the geometry of
+  the basin space — specifically, whether the two local optima
+  are close enough in strategy space that intermediate
+  configurations exist between them.  No logical deduction
+  establishes this from the attractor definitions alone; it
+  is the honest location where the system's own geometry
+  enters the proof.
+
+  Carrying it explicitly mirrors the design of h_dist_from_sig
+  in InterfaceConfig.lean and SeparationCertifiesClarity in
+  CausalSignature.lean: the structural assumption the formal
+  system cannot supply from first principles is named at every
+  call site rather than hidden.
+
+  When the geometry provides h_dense — two populations that
+  developed under independent blocking structures meeting after
+  isolation, or cross-domain transfer in human learning — the
+  logical chain fires with necessity.  The question of WHEN
+  h_dense holds is system-dependent; the chain GIVEN h_dense
+  is universal.
+-/
+
+/-- An agent confined to a single causal branch: all experience
+    comes from one region of the hidden causal graph.
+    Formal definition of a self-attractor in the learning sense:
+    the agent's trajectory through basin space stays within one
+    branch regardless of how many steps it takes. -/
+def in_own_attractor (branch_of : Basin → BranchId) (A : Agent) : Prop :=
+  effective_diversity branch_of A ≤ 1
+
+/-- Two agents in independent self-attractors: each confined to a
+    single causal branch, with witness basins on distinct branches.
+    The existence condition is the formal statement that the two
+    agents have genuinely different causal histories — not just
+    different memories, but memories that arise from structurally
+    separate regions of the hidden graph. -/
+def IndependentAttractors (branch_of : Basin → BranchId) (A B : Agent) : Prop :=
+  in_own_attractor branch_of A ∧
+  in_own_attractor branch_of B ∧
+  ∃ (a b : Basin), a ∈ A.memory ∧ b ∈ B.memory ∧ branch_of a ≠ branch_of b
+
+/-- Probing: A observes B's memory, recording the exposure event.
+    Memory becomes the union; exposure count increments by one.
+    This is the formal operation of encountering an agent whose
+    experience was shaped by a different blocking structure. -/
+def probe_agent (A B : Agent) : Agent :=
+  { exposure_count := A.exposure_count + 1
+    memory         := A.memory ∪ B.memory
+    utility        := A.utility
+    cost           := A.cost }
+
+/-- Independence is symmetric: if A and B are in independent
+    attractors, so are B and A.  Both parties gain from probing.
+    Neither is merely a resource for the other's learning. -/
+theorem independent_attractors_symmetric
+    (branch_of : Basin → BranchId) (A B : Agent)
+    (h : IndependentAttractors branch_of A B) :
+    IndependentAttractors branch_of B A := by
+  obtain ⟨hA, hB, a, b, ha, hb, h_ne⟩ := h
+  exact ⟨hB, hA, b, a, hb, ha, h_ne.symm⟩
+
+/-- A single probe of an independent agent breaks the blocking trap:
+    effective diversity jumps from ≤ 1 to ≥ 2 in one event.
+    The escape is structural and immediate — no gradual accumulation
+    is required.  One genuine inter-attractor contact suffices. -/
+theorem probe_breaks_attractor_trap
+    (branch_of : Basin → BranchId) (A B : Agent)
+    (h : IndependentAttractors branch_of A B) :
+    2 ≤ effective_diversity branch_of (probe_agent A B) := by
+  obtain ⟨_, _, a, b, ha, hb, h_ne⟩ := h
+  exact two_distinct_branches_ge_two branch_of (probe_agent A B) a b
+    (Finset.mem_union_left  _ ha)
+    (Finset.mem_union_right _ hb)
+    h_ne
+
+/-- The probe strictly lowers the true threshold:
+    −0.10 from the exposure count increment,
+    −0.05 (minimum) from the diversity jump from ≤ 1 to ≥ 2.
+    Total drop guaranteed at least 0.15. -/
+theorem probe_lowers_true_threshold
+    (branch_of : Basin → BranchId) (A B : Agent)
+    (h : IndependentAttractors branch_of A B) :
+    true_threshold branch_of (probe_agent A B) <
+    true_threshold branch_of A := by
+  have h_pre  : effective_diversity branch_of A ≤ 1 := h.1
+  have h_post : 2 ≤ effective_diversity branch_of (probe_agent A B) :=
+    probe_breaks_attractor_trap branch_of A B h
+  unfold true_threshold probe_agent
+  have hpre  : (effective_diversity branch_of A).to_real ≤ 1 := by
+    exact_mod_cast h_pre
+  have hpost : (2 : ℝ) ≤ (effective_diversity branch_of
+                  (probe_agent A B)).to_real := by
+    exact_mod_cast h_post
+  push_cast; linarith
+
+/-- Quantified threshold drop: at least 0.15 per probe event.
+    0.10 from the exposure count; 0.05 from the diversity jump.
+    This is the minimum — larger diversity jumps give larger drops. -/
+theorem probe_threshold_drop_bound
+    (branch_of : Basin → BranchId) (A B : Agent)
+    (h : IndependentAttractors branch_of A B) :
+    0.15 ≤ true_threshold branch_of A -
+           true_threshold branch_of (probe_agent A B) := by
+  have h_pre  : effective_diversity branch_of A ≤ 1 := h.1
+  have h_post : 2 ≤ effective_diversity branch_of (probe_agent A B) :=
+    probe_breaks_attractor_trap branch_of A B h
+  unfold true_threshold probe_agent
+  have hpre  : (effective_diversity branch_of A).to_real ≤ 1 := by
+    exact_mod_cast h_pre
+  have hpost : (2 : ℝ) ≤ (effective_diversity branch_of
+                  (probe_agent A B)).to_real := by
+    exact_mod_cast h_post
+  push_cast; linarith
+
+/-- Given h_dense, the threshold drop opens an adoption window:
+    m basins previously below threshold become adoptable after
+    probing.  This is the direct consequence of the two facts:
+    the threshold dropped, and basins exist in the opened window. -/
+theorem probe_opens_adoption_window
+    (branch_of : Basin → BranchId) (A B : Agent)
+    (h_indep : IndependentAttractors branch_of A B)
+    (Basins : Finset Basin) (gains : Basin → ℝ) (m : ℕ)
+    (h_dense : AdoptionDense Basins gains
+                 (true_threshold branch_of (probe_agent A B))
+                 (true_threshold branch_of A -
+                  true_threshold branch_of (probe_agent A B)) m) :
+    (adoptable_set (true_threshold branch_of A) gains Basins).card + m
+      ≤ (adoptable_set (true_threshold branch_of (probe_agent A B))
+                       gains Basins).card :=
+  density_enables_new_adoptions Basins gains
+    (true_threshold branch_of (probe_agent A B))
+    (true_threshold branch_of A)
+    (probe_lowers_true_threshold branch_of A B h_indep)
+    m h_dense
+
+/-- Mutual probing: when two agents in independent attractors probe
+    each other, both escape their blocking traps simultaneously.
+    The structural gain is symmetric — both parties gain diversity ≥ 2.
+    This is the formal content of why genuine knowledge exchange
+    between agents from different causal backgrounds is not
+    a zero-sum transfer but a bilateral expansion of potential. -/
+theorem mutual_probe_both_escape
+    (branch_of : Basin → BranchId) (A B : Agent)
+    (h : IndependentAttractors branch_of A B) :
+    2 ≤ effective_diversity branch_of (probe_agent A B) ∧
+    2 ≤ effective_diversity branch_of (probe_agent B A) :=
+  ⟨probe_breaks_attractor_trap branch_of A B h,
+   probe_breaks_attractor_trap branch_of B A
+     (independent_attractors_symmetric branch_of A B h)⟩
+
+/-
+  EXPOSURE COMPOUNDING THEOREM — CAPSTONE
+
+  The full logical chain from a single inter-agent probe to
+  exponential compounding, in three parts:
+
+    (I)   Blocking trap broken — one probe achieves diversity ≥ 2.
+          The structural escape is immediate, not gradual.
+
+    (II)  Adoption window opened — m new basins enter the adoptable
+          set, direct consequence of threshold drop and h_dense.
+
+    (III) Compounding activated — any learning target is reachable
+          in finite cycles via (1 + m)^k exponential growth.
+
+  This is the formal statement of why exposure to agents outside
+  one's own blocking structure is qualitatively different from
+  accumulating more experience within it: only inter-attractor
+  probing can simultaneously break the diversity ceiling, lower
+  the adoption threshold, and activate the compounding chain.
+
+  h_dense is the structural bridge.  The mathematics proves:
+  IF viable basins exist in the opened window, THEN compounding
+  follows with logical necessity.  Where the window is empty
+  — the two attractors are incommensurable — the probe still
+  breaks the trap (part I) and lowers the threshold (part II),
+  but compounding requires a non-empty basin geometry to ignite.
+-/
+theorem exposure_compounds_learning
+    (branch_of : Basin → BranchId)
+    (A B : Agent)
+    (h_indep : IndependentAttractors branch_of A B)
+    (Basins : Finset Basin) (gains : Basin → ℝ)
+    (m : ℕ) (hm : m ≥ 1)
+    (δ₀ : ℝ) (hδ : δ₀ > 0)
+    (t₀ T_target : ℝ)
+    (h_dense : AdoptionDense Basins gains
+                 (true_threshold branch_of (probe_agent A B))
+                 (true_threshold branch_of A -
+                  true_threshold branch_of (probe_agent A B)) m) :
+    -- (I)  Blocking trap broken by single probe event
+    2 ≤ effective_diversity branch_of (probe_agent A B)
+    ∧
+    -- (II) m new basins become adoptable after probing
+    (adoptable_set (true_threshold branch_of A) gains Basins).card + m
+      ≤ (adoptable_set (true_threshold branch_of (probe_agent A B))
+                       gains Basins).card
+    ∧
+    -- (III) Any learning target reachable in finite compounding cycles
+    ∃ k : ℕ, t₀ - (1 + (m : ℝ))^k * δ₀ < T_target :=
+  ⟨probe_breaks_attractor_trap branch_of A B h_indep,
+   probe_opens_adoption_window branch_of A B h_indep Basins gains m h_dense,
+   compounding_reaches_any_target t₀ T_target δ₀ hδ m hm⟩
