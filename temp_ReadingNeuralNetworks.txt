@@ -1,0 +1,285 @@
+# Reading Neural Networks Through Signal Geometry
+### A Practical Approach Grounded in Finite Iterative Systems
+
+---
+
+## The Core Reframe
+
+Don't look at the weights. Look at what signals *do*.
+
+A weight matrix tells you the recipe. Signal geometry tells you what the recipe cooks.
+You can read every weight in a neural network and still have no idea how information
+flows through it for a given input. The weights are anatomy. Signal geometry is physiology.
+
+The starting intuition: imagine a Minecraft pressure plate connected to a network of
+coupled rail carts. A mob steps on the plate — a binary signal — and that signal
+propagates through the coupled carts, each affecting its neighbors. What emerges in
+the carts is not binary. It's a probability field. A geometry. That geometry encodes
+the mob, not because anyone programmed it to, but because the coupling produced it.
+
+Neural networks work the same way. The geometry self-organizes from the couplings.
+You need probes to read it.
+
+---
+
+## The Theoretical Foundation
+
+A trained neural network is a finite deterministic system. This is not an approximation
+— floating point arithmetic is discrete, the architecture is fixed, the forward pass
+is deterministic. Therefore:
+
+**The MetaMap exists.** Any finite deterministic system eventually stabilizes into a
+quotient structure where trajectories collapse to canonical behaviors. You are not
+searching for something that might be there. It is provably there. The question is
+only how to read it efficiently.
+
+**The chain that gives you this:**
+
+```
+Neural network
+  → causal graph (the forward pass is a directed causal structure)
+  → finite iterative semigroup (the isomorphism that unlocks algebraic tools)
+  → stable attractor orbits (MetaMap theorem: every trajectory eventually stabilizes)
+  → co-product of cyclic groups (the algebraic structure of stable orbits)
+  → self-orienting to signal geometry (locking theorem: orients to local minimum)
+  → Turing universal (the liquid phase of this structure computes anything)
+```
+
+Every link in this chain has a formal proof. The implication: all the tools of
+semigroup theory, group theory, and dynamical systems theory apply directly to
+neural networks via this isomorphism.
+
+---
+
+## The Three Behavioral States
+
+Before probing, classify what you expect to find. The network's behavior at any
+region of input space falls into one of three algebraic states:
+
+**Solid** — Group-isomorphic rules. Always true regardless of input configuration.
+These are the network's invariants: "this input type always produces this response
+structure." Fully interpretable, fully stable. These are the fixed attractors.
+Signal behavior: small perturbation in, small perturbation out. Consistent across
+nearby inputs. The signal knows where it's going.
+
+**Liquid** — Co-product of cyclic groups. True conditional rules that vary with
+configuration, like a Rubik's cube — all states are valid, but which state you're
+in depends on context. This is where the network's active computation lives.
+Turing universal. Signal behavior: structured sensitivity, predictable variation
+patterns, periodic or quasi-periodic response to systematic input sweeps.
+
+**Plasma** — Semigroup non-convergence. The iterative rule never lands on a stable
+pattern. High tension, no attractor for the current input. Signal behavior: chaotic
+response to small perturbations, no stable signature across nearby inputs, high
+sensitivity everywhere. This region requires external intervention — the network
+is outside its trained basin.
+
+---
+
+## Concepts as Signal Geometry
+
+A concept is a covering of input space — a grouping of points that gives them
+shared meaning. The space of all possible concepts is 2^(N!) which is not
+enumerable. You cannot find concepts by searching concept space.
+
+You don't need to.
+
+The signal geometry finds them. A concept, operationally, is a smooth region
+of the signal flow field — a connected component where:
+
+- Small perturbation in → small perturbation out
+- Nearby inputs produce nearby activations at intermediate layers
+- The Jacobian (sensitivity) is low and stable
+
+Concept boundaries are where the geometry turns rough — high gradient, signals
+diverge, the Jacobian spikes. Superposition (where the network encodes multiple
+concepts in overlapping directions) lives at these boundaries — high gradient,
+multiple competing smooth regions meeting.
+
+The network did not define these concepts explicitly. They emerged as the stable
+coverings of the signal flow. You read them by mapping the geometry, not by
+searching the weight matrix.
+
+---
+
+## The Practical Probe Strategy
+
+**Step 1 — Systematic input perturbation**
+
+Take a base input. Apply small, systematic variations. Measure how the output
+changes. Map ∂output/∂input across your input distribution.
+
+Low sensitivity regions: you are in the interior of a concept. The network has
+a stable, confident answer. The signal flows cleanly.
+
+High sensitivity regions: you are near a concept boundary, or in a superposition
+zone, or entering a plasma region.
+
+**Step 2 — Layer-by-layer geometry mapping**
+
+At each layer, measure:
+- Do nearby inputs cluster together or diverge?
+- Do the activation patterns stabilize across layers or keep changing?
+- At what layer depth does the representation stop changing significantly?
+
+The `semi-conjugacy` property tells you this must stabilize at some layer depth.
+When it does, you have found the layer where the MetaMap has converged. That layer
+is your most readable layer — the network has "made up its mind" by then.
+
+**Step 3 — Look for cyclic structure**
+
+Sweep inputs along systematic dimensions (brightness, rotation, frequency, etc.).
+Watch the activation patterns at intermediate layers. Do they cycle? Do they
+tile into repeating patterns?
+
+If the network learned the algebraic structure of the problem, you should find
+ZMod-n structure — cyclic repetition in activation space corresponding to
+the cyclic structure of the domain. A network trained on modular arithmetic
+should show circular structure. A network trained on rotation-invariant tasks
+should show rotational periodicity in its intermediate representations.
+
+This is empirically testable and is the bridge between the algebraic theory
+and measurable network behavior.
+
+**Step 4 — Blocking structure identification**
+
+Some regions of input space will show trajectories (across layers) that never
+escape a constrained subspace. These are blocking structures — the network
+cannot represent concepts outside its trained distribution from within these
+inputs.
+
+Markers: activation patterns at later layers collapse to a small subspace
+regardless of variation in the input. The network is "stuck" — not confused,
+but structurally confined to a single causal branch.
+
+These regions identify the boundary of the network's competence. Not failure
+of intelligence — structural impossibility given the training distribution.
+
+**Step 5 — Plasma region detection**
+
+High sensitivity everywhere, no stable signature, chaotic response to systematic
+sweeps, no convergence across layers. You are in a plasma region.
+
+This is the network's honest confession: it has no reliable MetaMap for this
+input. The appropriate response from the system is not to try harder. It is
+to hand off — flag for human review, trigger a safe fallback, log for future
+training.
+
+The plasma detector is the most safety-relevant output of a signal geometry
+analysis. It tells you where the network's behavior is unreliable before
+something goes wrong, not after.
+
+---
+
+## What to Measure
+
+| Measurement | What it reveals |
+|---|---|
+| Jacobian (∂output/∂input) | Smooth vs. rough geometry; concept interiors vs. boundaries |
+| Layer-wise activation clustering | At what depth representation stabilizes (semi-conjugacy point) |
+| Cyclic sweep response | Whether ZMod-n / cyclic group structure is present |
+| Signature stability across nearby inputs | Solid vs. liquid vs. plasma classification |
+| Activation subspace confinement | Blocking structures; distribution boundary |
+| Cross-layer trajectory divergence | Constructive vs. destructive interference between input types |
+
+---
+
+## The Concept Composition Problem
+
+When two concepts interact in the network, they are either:
+
+**Constructively interfering** — their signal geometries are compatible, they
+stay within a shared entropy budget, a single probe configuration handles both.
+The network computes their interaction cleanly.
+
+**Destructively interfering** — their trajectories push into new signature-space
+regions neither handles alone. Complexity explodes. You need separate probe
+configurations for each.
+
+The constructive/destructive classification tells you which parts of the network
+can be analyzed jointly and which must be analyzed separately. Trying to analyze
+destructively interfering regions with a single probe framework is why global
+interpretability is hard — you are forcing compatibility where there is none.
+
+---
+
+## The Validation Strategy
+
+Start with networks trained on problems with known algebraic structure:
+
+**Modular arithmetic** — the ground truth solution uses ZMod-n structure.
+If the signal geometry shows circular/cyclic patterns in activation space,
+the framework is confirmed. (Note: this has already been partially observed
+empirically by other researchers, who found discrete Fourier structure in
+transformers trained on modular addition — without the algebraic framework
+to explain why.)
+
+**Permutation problems** — ground truth is symmetric group structure.
+Look for permutation-equivariant geometry in intermediate activations.
+
+**Hierarchical classification** — ground truth is a tree/lattice structure.
+Look for nested covering structure in the signal geometry.
+
+In each case: if the network's signal geometry reflects the problem's algebraic
+structure, the chain from neural network to finite iterative semigroup to
+algebraic structure is empirically grounded.
+
+---
+
+## The Conservation Signature
+
+In regions where the network has a stable, reliable circuit (solid state,
+fully converged), there is a conservation property: the total "friction"
+(accumulated signal change) over a complete cycle in the activation trajectory
+is the identity. The signal returns to where it started.
+
+This is not assumed — it is an algebraic consequence of being in a stable basin
+with commutative group structure. You can test for it: probe the stable circuit
+with inputs that form a natural cycle (rotate an image 360 degrees, traverse
+a modular arithmetic cycle, etc.) and measure whether the activations return
+to their starting configuration.
+
+If they do: you have confirmed a solid-state, fully conserved circuit.
+If they don't: you are in liquid or plasma territory.
+
+---
+
+## Summary: The Reading Protocol
+
+1. **Sweep inputs systematically** — map the Jacobian across your input distribution.
+
+2. **Classify regions** — solid (low, stable sensitivity), liquid (structured
+   sensitivity), plasma (chaotic, unstable).
+
+3. **Find the semi-conjugacy layer** — where layer-wise representation stops changing.
+   This is your most readable layer.
+
+4. **Map smooth regions as concepts** — connected components of low-sensitivity
+   flow are the network's learned concepts. You did not enumerate them; the geometry
+   found them.
+
+5. **Look for cyclic structure** — systematic sweeps revealing ZMod-n patterns
+   confirm the algebraic structure of what the network learned.
+
+6. **Identify blocking structures** — regions where the signal never escapes a
+   confined subspace. These are the distribution boundaries.
+
+7. **Flag plasma regions** — these are where the network is unreliable. These are
+   your safety-critical outputs.
+
+8. **Test conservation** — cycle inputs through known cycles and verify activation
+   return for solid circuits.
+
+The network is not a black box. It is a finite iterative system with a provably
+existing MetaMap. The signal geometry is that MetaMap made visible. You are not
+reverse-engineering something arbitrary — you are reading a structured object
+that algebraic theory says must have this structure. The geometry is real.
+The probes just let you see it.
+
+---
+
+*Theoretical grounding: finite iterative semigroup theory, causal graph isomorphism,
+blocking trap theorem, MetaMap isomorphism theorem, liquid-phase Turing universality,
+tension spider PDE derivation, conservation law from stabilized basins.*
+
+*Origin: Minecraft rail cart experiment, November 2025.*
