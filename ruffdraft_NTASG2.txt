@@ -1,0 +1,53 @@
+Introduction
+
+Neural networks, whether biological or artificial, can be formally understood as finite deterministic dynamical systems. Each forward pass in a network defines a self-map on a high-dimensional state space α:
+
+f:α→α
+
+Because α is effectively finite in any real system (discrete firing states, floating-point approximations), every trajectory under repeated application of f eventually settles into a cyclic orbit. By identifying states whose orbits converge, we construct a MetaMap quotient Q=α/∼, which captures the essential attractor structure of the network.
+
+Mathematically, this yields four immediate consequences:
+
+Semi-conjugacy: The original network dynamics factor through the MetaMap projection π:α→Q.
+Compression: The MetaMap is strictly smaller than the full state space.
+Cyclic orbit structure: Every element of Q lies in a fixed-point or cyclic attractor.
+Conceptual completeness: Two states share a MetaMap class if and only if their trajectories converge.
+
+From this perspective, what experimental neuroscientists observe as signal geometry—smooth trajectories, attractor basins, and sensitive boundaries—is not fundamental, but a continuous “shadow” of the discrete MetaMap structure. This formalism provides a directly testable hypothesis: by tracking convergence patterns, cyclicity, and basin stability in neural data, one can empirically reconstruct the underlying attractor geometry of the network.
+
+In other words, the mathematics prescribes what to measure and where to look, rather than merely describing phenomena after the fact.
+
+Neurotransmitters as Topographic Modulators
+
+This framework immediately suggests a reinterpretation of neuromodulators:
+
+Neurotransmitters do not merely carry content or linear gain signals.
+Instead, they modify the transition function f
+γ
+	​
+
+:α→α, reshaping attractor basins in real time.
+
+For example, consider dopamine:
+
+High dopamine: Steepens basin gradients, enlarging dominant attractor regions. Trajectories converge more quickly and may collapse previously distinct attractor classes, potentially leading to overgeneralization.
+Low dopamine: Flattens basin gradients, making convergence slower and trajectories more sensitive to perturbations, consistent with distractibility or unstable representations.
+
+This interpretation is experimentally actionable. By controlling neuromodulator levels in simplified systems—cell cultures, organoids, or isolated circuits—researchers can measure:
+
+Trajectory convergence: How quickly different initial states reach the same MetaMap class.
+Attractor cycle lengths: The periodicity of settled dynamics.
+Basin stability: How sensitive attractor classes are to perturbations.
+
+These observables are exactly those predicted by the finite dynamical system and MetaMap compression, allowing a direct mapping from neurotransmitter effects to underlying attractor geometry.
+
+Predictive Principle
+
+Rather than offering post hoc explanations, this model dictates the experimental protocol:
+
+Identify convergent classes (π(x)=π(y)) through repeated sampling.
+Measure periods and cycle structures in the MetaMap projection.
+Apply neuromodulatory perturbations and track shifts in attractor topology.
+Quantify basin stability and sensitivity to infer the effect of specific neurotransmitters.
+
+This approach transforms the study of neuromodulation from descriptive neuroscience into quantitative, topologically guided measurement, grounded in rigorous mathematics. Signal geometry is not just a metaphor; it is the observable shadow of an underlying, testable attractor structure.
