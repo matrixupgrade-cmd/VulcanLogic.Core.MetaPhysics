@@ -1,0 +1,145 @@
+Signal Geometry as a Window onto Neural Attractor Structure
+
+Introduction
+
+The MetaMap theorem (formalized in NeuralNetworkAsCompression.lean) establishes that any
+finite deterministic self-map — and by continuous limit, any sufficiently well-behaved dynamical
+system — admits a canonical compression to a quotient structure whose properties are fully
+determined by orbit convergence. Specifically, four properties hold:
+
+
+Semi-conjugacy: The original dynamics factor through the MetaMap projection π.
+Compression: The MetaMap has cardinality no greater than the original state space.
+Cyclic orbit structure: Every element of the MetaMap lies in a fixed-point or cyclic attractor.
+Conceptual completeness: Two states share a MetaMap class if and only if their trajectories converge.
+
+
+These are mathematical results, not biological claims. The theorem makes no assertion about neurons.
+What it provides is a coordinate system: a precise vocabulary for describing attractor geometry in
+any system that can be modeled as a dynamical map.
+
+The question this paper addresses is empirical: does signal geometry in neural circuits serve as
+a measurable window onto this structure? If it does, the framework prescribes exactly what to
+look for and what changes mean. If it does not, that failure is itself informative.
+
+
+The Mathematical Foundation
+
+For any self-map f : α → α on a finite or continuous state space, the attractor equivalence
+relation x ~ y (defined by eventual orbit convergence: ∃T such that f^T(x) = f^T(y)) partitions
+the space into MetaMap classes. Three observable signatures follow directly from the orbit
+period of each class:
+
+
+Period 1 (solid state): fixed-point attractor. The system has an unconditional invariant
+here. Perturbations return to the same class immediately.
+Period n > 1 (liquid state): genuinely cyclic attractor with ZMod-n algebraic structure.
+The system supports conditional computation and, by a related theorem, Turing-universal dynamics.
+Pre-convergence (plasma state): the trajectory has not yet settled to an attractor class.
+Behavior here is unreliable; the MetaMap class has not yet crystallized.
+
+
+These three regimes are not interpretive labels. They are read directly off orbit period, which
+is in principle measurable from time-series data.
+
+
+Signal Geometry as the Empirical Bridge
+
+The conjecture this paper proposes for empirical investigation is the following:
+
+
+Signal geometry measurements in neural circuits are empirical approximations of the MetaMap
+projection π — that is, the observable geometry of population activity reflects the underlying
+attractor structure that the MetaMap framework predicts must exist in any sufficiently
+regular dynamical system.
+
+
+
+This is Layer 2 of the argument and it is a conjecture, not a consequence of the theorem. The
+theorem guarantees that attractor structure exists in any dynamical system meeting the framework's
+conditions. Whether neural circuits meet those conditions, and whether signal geometry is the
+right observable window onto that structure, are empirical questions.
+
+Existing work on signal geometry in artificial neural networks — including the observation of
+circular representations in modular arithmetic networks — provides early and suggestive
+evidence that MetaMap-like structure is measurable in practice. The present proposal is to
+test whether the same holds in biological circuits.
+
+
+Experimental Protocol
+
+The proposed experimental approach follows directly from the framework's structure. The goal is
+not to verify the theorem — that is already established — but to test whether signal geometry
+in a real neural circuit behaves as the framework predicts it should.
+
+Step 1 — Establish baseline signal geometry. In a tractable model circuit (a dissociated
+culture, an organoid, or an isolated preparation such as the Drosophila central complex), record
+population activity under natural stimulation. From this data, characterize:
+
+
+Convergence patterns: which initial states reach the same long-run activity profile?
+Basin structure: how large and how stable are the convergent regions?
+Cycle lengths: is there periodic structure in settled population dynamics?
+Boundary sensitivity: where are transitions between convergent classes sharpest?
+
+
+These observables correspond directly to the MetaMap's attractor classes, basin geometry, orbit
+periods, and concept boundaries respectively. The framework predicts all four should be
+measurable; the experiment confirms or refutes that prediction.
+
+Step 2 — Apply neuromodulatory perturbation. Modify a specific neuromodulator — dopamine,
+serotonin, acetylcholine — at a controlled concentration while holding stimulation constant.
+
+Step 3 — Observe changes in signal geometry. The framework predicts that any neuromodulator
+acts as a modifier of the transition function f_γ : α → α, reshaping attractor basins in real
+time. The specific direction of that modification is itself a testable hypothesis:
+
+
+Do basins enlarge or contract?
+Do previously distinct convergent classes merge?
+Do cycle lengths increase or decrease?
+Does pre-convergence (plasma-state) behavior become more or less prevalent?
+
+
+The framework does not dictate which neuromodulator produces which effect. That is what the
+experiment determines. What the framework provides is the measurement vocabulary: basin size,
+cycle period, boundary sharpness, and convergence rate are the quantities to track, because
+those are exactly what a change in f_γ would alter.
+
+
+Neuromodulators as Basin Modifiers: Conditional Predictions
+
+The following predictions are conditional on the empirical bridge (Layer 2) being established.
+They describe what the framework would predict if signal geometry is confirmed as a reliable
+observable of underlying attractor structure.
+
+Under the MetaMap model, a neuromodulator does not carry content or act as a linear gain signal.
+It modifies the topology of the attractor landscape — the shape and size of basins, the depth
+of fixed-point attractors, and the period of cyclic orbits. As a working hypothesis for
+experimental design:
+
+High dopamine is predicted to steepen basin gradients, causing trajectories to converge more
+rapidly and potentially collapsing previously distinct attractor classes. In signal geometry
+terms: larger basins, shorter convergence times, reduced boundary sharpness between adjacent
+classes, increased solid-state (period-1) prevalence.
+
+Low dopamine is predicted to flatten basin gradients, slowing convergence and increasing
+sensitivity to perturbations. In signal geometry terms: smaller or fragmented basins, longer
+convergence times, sharper boundaries, increased plasma-state prevalence.
+
+These are predictions in the framework's language, not assertions about known neuroscience.
+They are stated here to make the framework falsifiable: if dopamine manipulation produces the
+opposite pattern, or no systematic change in basin geometry, that is evidence against the
+model's applicability to the system under study.
+
+
+Summary
+
+The argument has three layers with distinct epistemic status:
+
+LayerClaimStatus1Any dynamical system has MetaMap attractor structureProven (Lean formalization)2Signal geometry in neural circuits is an observable window onto that structureConjecture — requires empirical validation3Neuromodulator effects are measurable as basin topology changesConditional on Layer 2
+
+The framework's contribution is not to assert that neural circuits work a particular way. It is
+to prescribe what to measure, given the conjecture that signal geometry is the right observable,
+and to make the predictions specific enough to be falsifiable. The petri dish comes before
+the theory claim.
