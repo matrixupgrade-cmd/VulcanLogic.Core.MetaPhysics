@@ -1,0 +1,123 @@
+# Signal Geometry as a Window onto Neural Attractor Structure
+
+## Introduction
+
+The MetaMap theorem (formalized in `NeuralNetworkAsCompression.lean`) establishes that any
+finite deterministic self-map — and, by continuous limit, any sufficiently well-behaved dynamical
+system — admits a canonical compression to a quotient structure whose properties are fully
+determined by orbit convergence. Four properties hold:
+
+1. **Semi-conjugacy**: The original dynamics factor through the MetaMap projection π.
+2. **Compression**: The MetaMap has cardinality no greater than the original state space.
+3. **Cyclic orbit structure**: Every element of the MetaMap lies in a fixed-point or cyclic attractor.
+4. **Conceptual completeness**: Two states share a MetaMap class if and only if their trajectories converge.
+
+These are purely mathematical results. The theorem makes no assertion about neurons or biology.
+Its value is to provide a coordinate system — a precise vocabulary for describing attractor
+geometry in any system that can be modeled as a dynamical map.
+
+The empirical question this paper addresses: *does signal geometry in neural circuits provide a
+measurable window onto this structure?* If yes, the framework prescribes exactly what to look
+for and how to interpret changes. If no, that failure is itself informative.
+
+---
+
+## Mathematical Foundation
+
+For a self-map f : α → α on a finite or continuous state space, define the equivalence relation
+
+&nbsp;&nbsp;&nbsp;&nbsp;x ~ y &nbsp;&nbsp;iff&nbsp;&nbsp; ∃T : f^T(x) = f^T(y)
+
+which partitions the state space into MetaMap classes. Three dynamical regimes follow directly
+from orbit period:
+
+- **Period 1 (solid state)**: fixed-point attractor. Perturbations return to the same class immediately.
+- **Period n > 1 (liquid state)**: cyclic attractor with ℤ/nℤ algebraic structure. Supports
+  conditional computation and, by a related theorem, Turing-universal dynamics.
+- **Pre-convergence (plasma state)**: trajectory has not yet settled to an attractor class.
+  Behavior is unreliable.
+
+These are not interpretive labels — they are read directly off orbit period, which is in
+principle measurable from time-series data.
+
+---
+
+## Signal Geometry as the Empirical Bridge
+
+The central conjecture:
+
+> Signal geometry measurements in neural circuits approximate the MetaMap projection π — the
+> observable geometry of population activity reflects the underlying attractor structure that
+> the framework predicts must exist in any sufficiently regular dynamical system.
+
+This is Layer 2: a testable empirical hypothesis, distinct from the theorem itself. Whether
+neural circuits satisfy the dynamical assumptions, and whether signal geometry is the right
+observable window, are open questions requiring empirical validation.
+
+Early evidence from artificial neural networks — including circular representations observed in
+modular arithmetic networks — suggests MetaMap-like structure is measurable in practice. The
+present proposal is to test whether the same holds in biological circuits.
+
+---
+
+## Experimental Protocol
+
+The protocol's goal is not to verify the theorem — that is already established — but to test
+whether signal geometry in a real neural circuit behaves as the framework predicts.
+
+**Step 1 — Establish baseline signal geometry.** In a tractable model circuit (a dissociated
+culture, an organoid, or an isolated preparation such as the Drosophila central complex), record
+population activity under natural stimulation. Characterize:
+
+- **Convergence patterns**: which initial states reach the same long-run activity profile
+- **Basin structure**: size and stability of convergent regions
+- **Cycle lengths**: periodicity of settled population dynamics
+- **Boundary sensitivity**: sharpness of transitions between convergent classes
+
+Each observable maps directly onto a quantity the framework defines: attractor classes, basin
+geometry, orbit periods, and concept boundaries respectively.
+
+**Step 2 — Apply neuromodulatory perturbation.** Modify a specific neuromodulator (dopamine,
+serotonin, acetylcholine) at a controlled concentration while holding stimulation constant.
+
+**Step 3 — Observe changes in signal geometry.** Under the model, any neuromodulator acts as a
+modifier of the transition function f_γ : α → α, reshaping attractor basins in real time. Track:
+
+- Basin size changes
+- Merging or splitting of convergent classes
+- Shifts in cycle length distribution
+- Changes in plasma-state prevalence
+
+The framework does not specify which neuromodulator produces which effect — that is what the
+experiment determines. What it provides is the measurement vocabulary.
+
+---
+
+## Neuromodulators as Basin Modifiers
+
+*The following are conditional predictions — they apply if the empirical bridge (Layer 2) is established.*
+
+Under the model, a neuromodulator does not carry content or act as a linear gain signal. It
+modifies the topology of the attractor landscape. As working hypotheses for experimental design:
+
+- **High dopamine**: steeper basin gradients → faster convergence, larger basins, reduced
+  boundary sharpness, increased solid-state prevalence.
+- **Low dopamine**: flatter basin gradients → slower convergence, fragmented basins, sharper
+  boundaries, increased plasma-state prevalence.
+
+Observing the opposite pattern, or no systematic change in basin geometry, would challenge the
+model's applicability to the system under study.
+
+---
+
+## Summary
+
+| Layer | Claim | Status |
+|-------|-------|--------|
+| 1 | Any dynamical system has MetaMap attractor structure | **Proven** (Lean formalization) |
+| 2 | Signal geometry in neural circuits is an observable window onto that structure | **Conjecture** — empirical validation required |
+| 3 | Neuromodulator effects are measurable as basin topology changes | **Conditional** on Layer 2 |
+
+This framework does not assert how neural circuits work. It prescribes what to measure and in
+what language — making experimental predictions precise enough to be falsifiable. The petri
+dish comes before the theory claim.
